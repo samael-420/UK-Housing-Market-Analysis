@@ -138,7 +138,7 @@ RETURN DIVIDE(LatestPrice - EarlyPrice, EarlyPrice, 0) * 100
  
 ## Dataset
  
-UK Land Registry Price Paid Data — publicly available at [GOV.UK](https://www.gov.uk/government/statistical-data-sets/price-paid-data)
+UK Land Registry Price Paid Data — publicly available at [GOV.UK](https://www.gov.uk/government/organisations/land-registry/about)
  
 - **22,489,348 transactions**
 - **11 columns** including price, date, property type, build type, and location
@@ -148,12 +148,11 @@ UK Land Registry Price Paid Data — publicly available at [GOV.UK](https://www.
  
 ## Why Median Not Mean?
  
-Throughout this project, **median** is used instead of mean for all price calculations. A small number of multi-million pound transactions would significantly distort the mean upward, misrepresenting what a typical buyer pays. Median is the same methodology used by Halifax, Nationwide, and the ONS in their official house price indices.
+Throughout this project, I used median instead of mean for all price calculations because a small number of multi-million pound transactions would significantly distort the mean upward and would misrepresent what an average buyer pays. Median is the same methodology used by Halifax, Nationwide, and the ONS in their official house price indices.
  
 ---
  
 ## Author
  
 **Rutvik Randive**
-MSc Data Science and Analytics — Cardiff University
-[LinkedIn](https://your-linkedin-url) | [GitHub](https://github.com/YOUR-USERNAME)
+MSc Data Science and Analytics - Cardiff University
