@@ -37,13 +37,6 @@ Using the UK Land Registry Price Paid dataset (22,489,348 transactions across 11
  
 ---
  
-## Table Architecture
- 
-┌─────────────────────┐  ┌──────────────────────┐  ┌─────────────────┐  ┌──────────────────┐
-│  annual_summary     │  │  regional_summary     │  │  town_summary   │  │  county_lookup   │
-│  (year, type,       │  │  (county, year,       │  │  (town, county, │  │  (one row per    │
-│   build, price)     │  │   price, sales)       │  │   price, sales) │  │   county)        │
-└─────────────────────┘  └──────────────────────┘  └─────────────────┘  └──────────────────┘
 
 ## Data Model (Star Schema)
  
@@ -67,7 +60,7 @@ Using the UK Land Registry Price Paid dataset (22,489,348 transactions across 11
 ## Challenges & How They Were Solved
  
 ### 1. Query Exceeded Available Resources
-**Problem:** Power BI crashed when trying to calculate `MEDIANX` across 22 million raw rows.
+**Problem:** Power BI kept crashing when trying to calculate `MEDIANX` across 22 million raw rows.
  
 **Solution:** Pre-aggregated the data in Python using Pandas `groupby` and `median` before loading into Power BI. This reduced the data Power BI needed to process from 22M rows to a few thousand summary rows, eliminating the memory issue entirely. This also improved dashboard load times significantly.
  
@@ -77,22 +70,13 @@ Using the UK Land Registry Price Paid dataset (22,489,348 transactions across 11
 **Problem:** When trying to connect `housing_regional_summary[county]` to `housing_town_summary[county]`, Power BI threw an error:
 > *"Column 'county' contains a duplicate value 'AVON' and this is not allowed for columns on the one side of a many-to-one relationship"*
  
-This happened because `regional_summary` has one row per county **per year** — so every county appears multiple times, making it unsuitable for the "one" side of a relationship.
+This happened because `regional_summary` has one row per county **per year** , so every county appears multiple times, making it unsuitable for the "one" side of a relationship.
  
 **Solution:** Created a separate `county_lookup` table in Python with exactly one row per county. This acts as a proper dimension table in the star schema, sitting on the "one" side of relationships to both `regional_summary` and `town_summary`. This is standard dimensional modelling practice.
  
 ---
  
-### 3. Flat Line on Price Trend Chart
-**Problem:** The median price line chart showed the same value for every year — a completely flat line.
- 
-**Root cause:** The `Median Price` DAX measure was built on `housing_annual_summary`. When `housing_regional_summary[county]` was placed on the axis of a different chart, there was no relationship path for the measure to filter by county, so it returned the same total for every bar.
- 
-**Solution:** Created separate measures for each context — `Regional Median Price` pulling from `housing_regional_summary`, and `Town Median Price` pulling from `housing_town_summary`. Each visual now uses the measure matched to its source table, ensuring filters propagate correctly.
- 
----
- 
-## DAX Measures
+## DAX Measures used
  
 ```
 Total Sales = COUNTROWS(housing_annual_summary)
@@ -132,19 +116,19 @@ RETURN DIVIDE(LatestPrice - EarlyPrice, EarlyPrice, 0) * 100
 ## Project Structure
  
 ```
-├── uk_housing_analysis.ipynb        # Full analysis and aggregation notebook
+├── uk_housing.ipynb        # Full analysis and aggregation notebook
 ├── housing_annual_summary.csv       # Aggregated by year, property type, build type
 ├── housing_regional_summary.csv     # Aggregated by county and year
 ├── housing_town_summary.csv         # Aggregated by town and county
 ├── housing_county_lookup.csv        # One row per county (dimension table)
-├── dashboard_page1.png              # Market Overview screenshot
-├── dashboard_page2.png              # Regional Analysis screenshot
+├── ukhousepre1.png              # Market Overview screenshot
+├── ukhousepre1.png              # Regional Analysis screenshot
 └── README.md
 ```
  
 ---
  
-## Tools & Libraries
+## Tools & Libraries used
  
 - **Python** — Pandas, NumPy, Matplotlib, Seaborn, Plotly
 - **Power BI** — DAX measures, star schema data model, interactive dashboard
