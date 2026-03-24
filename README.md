@@ -7,16 +7,16 @@ Analysis of 22 million UK property transactions using Python and Power BI, explo
 ## Dashboard Preview
  
 **Page 1 — Market Overview**
-![Market Overview](dashboard_page1.png)
+![Market Overview](ukhousepre1.png)
  
 **Page 2 — Regional Analysis**
-![Regional Analysis](dashboard_page2.png)
+![Regional Analysis](ukhousepre2.png)
  
 ---
  
 ## Project Overview
  
-Using the UK Land Registry Price Paid dataset (22,489,348 transactions across 11 columns), this project analyses house price trends from 1995 to 2017. Due to the scale of the data, Python was used to clean and pre-aggregate the dataset into summary tables before loading into Power BI — a deliberate architectural decision to optimise dashboard performance.
+Using the UK Land Registry Price Paid dataset (22,489,348 transactions across 11 columns), this project analyses house price trends from 1995 to 2017. Due to the scale of the data, I used python to clean and pre-aggregate the dataset into summary tables before loading into Power BI to optimize performance
  
 **Business Questions Answered:**
 1. How have UK house prices trended over time?
@@ -37,28 +37,14 @@ Using the UK Land Registry Price Paid dataset (22,489,348 transactions across 11
  
 ---
  
-## Technical Architecture
+## Table Architecture
  
-One of the key decisions in this project was how to handle 22M+ rows in Power BI. Loading raw transaction data directly caused Power BI to exceed available resources when calculating MEDIAN across the full dataset. The solution was to pre-aggregate in Python before loading into Power BI:
- 
-```
-Raw CSV (22M rows)
-        ↓ Python (Pandas)
-        ↓ Clean + Aggregate
-        ↓
 ┌─────────────────────┐  ┌──────────────────────┐  ┌─────────────────┐  ┌──────────────────┐
 │  annual_summary     │  │  regional_summary     │  │  town_summary   │  │  county_lookup   │
 │  (year, type,       │  │  (county, year,       │  │  (town, county, │  │  (one row per    │
 │   build, price)     │  │   price, sales)       │  │   price, sales) │  │   county)        │
 └─────────────────────┘  └──────────────────────┘  └─────────────────┘  └──────────────────┘
-        ↓
-   Power BI Dashboard
-```
- 
-This approach — pre-processing in Python, visualising summaries in Power BI — is standard practice for large datasets in professional BI environments.
- 
----
- 
+
 ## Data Model (Star Schema)
  
 ```
@@ -72,10 +58,9 @@ This approach — pre-processing in Python, visualising summaries in Power BI �
                           ↓
                     [county_lookup] ── county → county ──→ [town_summary]
  
-[_Measures] — dedicated measures table, no relationships
+[Measures] - measures only table, no relationships
 ```
  
-A dedicated `_Measures` table holds all DAX measures — a best practice that keeps the data model clean and measures easy to find.
  
 ---
  
